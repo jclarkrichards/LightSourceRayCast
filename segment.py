@@ -1,30 +1,36 @@
-"""A Segment is a line with endpoints"""
+"""
+A Segment is a line with endpoints.
+The direction of a segment should not matter, but for purposes of detecting intersections one end
+of the segment needs to be designated as the start of the segment and the other end as the end of the segment.
+"""
 from vector import Vector2
 
 class Segment(object):
-    def __init__(self, start, end):
-        self.start = Vector2(start[0], start[1])
-        self.end = Vector2(end[0], end[1])
-        self.vec = self.end - self.start
-        self.norm = self.vec.normalize()
+    def __init__(self, vertex0, vertex1):
+        self.tail = vertex0
+        self.head = vertex1
+        #self.start = vertex0.position
+        #self.end = vertex1.position
+        self.vec = self.head.position - self.tail.position
+        #self.norm = self.vec.normalize()
         self.thresh = 0.000000001
-        self.neighbors = [] #Other segments that are connected to this segment
+        #self.neighbors = [] #Other segments that are connected to this segment
 
     def __str__(self):
-        return "Segment: " + str(self.start) + " ===> " + str(self.end)
+        return "Segment: " + str(self.tail) + " ===> " + str(self.head)
 
     def __eq__(self, other):
         '''Two segments are equal if they have the same start and end vertices'''
-        if self.start == other.start and self.end == other.end:
+        if self.tail == other.tail and self.head == other.head:
             return True
         return False
     
-    def intersect(self, start, unitray): #unitray is the rays unit vector
+    def intersect(self, ray):
         '''Return the T value where the ray intersects the segment'''
-        denom = self.vec.cross(unitray)
+        denom = self.vec.cross(ray.norm)
         if denom != 0:
-            vec = start - self.start
-            num1 = vec.cross(unitray)
+            vec = ray.start - self.tail.position
+            num1 = vec.cross(ray.norm)
             num2 = vec.cross(self.vec)
             t = num1 / denom
             s = num2 / denom
@@ -46,10 +52,10 @@ class Segment(object):
         if abs(value) < self.thresh:
             return 0
         return value
-
-    def addNeighbor(self, segment):
-        self.neighbors.append(segment)
-
+    """
+    #def addNeighbor(self, segment):
+    #    self.neighbors.append(segment)
+    
     def getNeighbor(self, value):
         '''Input either a 0 or a 1.  If 0, then return the neighbor with same self.start.  otherwise return self.end neighbor'''
         if value == 0:
@@ -61,7 +67,7 @@ class Segment(object):
             if n.start == vertex or n.end == vertex:
                 return n
         return None
-
+    
     def getVector(self, reverse=False):
         if not reverse:
             return self.end - self.start
@@ -97,4 +103,4 @@ class Segment(object):
                 r.cross(v) < 0 and r.cross(v) < 0):
                 return False
         return True
-        
+        """

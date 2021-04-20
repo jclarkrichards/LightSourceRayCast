@@ -8,16 +8,11 @@ class Ray(object):
         self.start = start  #follows the light source
         self.end = end  #End end of this ray will change as the light source moves around
         self.anchor = end #never changes.  Where the ray is always pointing towards
-        #self.probe1 = None
-        #self.probe2 = None
         self.setNormVec()
-        #print(str(self.start) + " " + str(self.end))
-        #print("Normalized ray: " + str(self.norm))
         self.intersectorTest = None #just for testing to show where ray is intersecting
         self.allpoints = []
-        #self.rayprobe1 = None
         
-    def update(self, dt, start):
+    def update(self, start):
         '''Update the origin of each ray as the light source moves around'''
         self.start = start
         self.setNormVec()
@@ -32,6 +27,35 @@ class Ray(object):
         #print(self.rayprobe1)
         
     def intersect(self, segments):
+        '''Given a list of segments, determine which segments we are intersecting with and where
+        The closest segment is the one we are interested in.'''
+        best_segment = segments[0]
+        best_s = float('inf')
+        best_t = 0
+        self.allpoints = []
+        if self.norm.magnitudeSquared() != 0:
+            for segment in segments:
+                t, s = segment.intersect(self)     
+                if s != -1:
+                    if s < best_s:
+                        best_s = s
+                        best_t = t
+                        best_segment = segment
+
+        #print("Best: " + str(best_segment) + " T = " + str(best_t) + " S = " + str(best_s))
+        self.end = self.start + self.norm * best_s
+        self.addEndPoint(self.end)
+
+        if t == 0 or t == 1:
+            print("Can the ray proceed?");
+               
+
+            
+
+
+
+
+    def intersect_Old(self, segments):
         '''Find closest intersection point given a list of segments'''
         Tvalues = []
         Svalues = []
@@ -89,7 +113,7 @@ class Ray(object):
                                 Svalues_new.pop(index)
                                 Tvalues_new.pop(index)
                                 segments_new.pop(index)
-                                self.addEndPoint(segment.start + segment.vec * T)
+                                self.addEndPoint(segment.tail.position + segment.vec * T)
                             else:
                                 endpointFound = True
                     else:
@@ -105,7 +129,7 @@ class Ray(object):
                 #if self.end == segment.start:
                 #self.intersectors.append(segment.start + segment.vec * T)
                 #self.intersectorTest = segment.start + segment.vec * T
-                self.end = segment.start + segment.vec * T
+                self.end = segment.tail.position + segment.vec * T
                 self.addEndPoint(self.end)
                 #    pass
             else:
@@ -121,19 +145,4 @@ class Ray(object):
             
     def render(self, screen):
         pygame.draw.line(screen, YELLOW, self.start.asTuple(), self.end.asTuple(), 1)
-        #if self.probe1 is not None:
-        #    vec1 = self.end + self.probe1
-        #    pygame.draw.line(screen, GREEN, self.start.asTuple(), vec1.asTuple(), 1)
-        #if self.probe2 is not None:
-        #    vec2 = self.end + self.probe2
-        #    pygame.draw.line(screen, BLUE, self.start.asTuple(), vec2.asTuple(), 1)
-        
-        #if self.intersectorTest is not None:
-        #    pos = self.intersectorTest.asInt()
-        #    pygame.draw.circle(screen, RED, pos, 5)
-
-        #print("There are " + str(len(self.intersectors)))
-        #for intersector in self.intersectors:
-        #    pos = intersector.asInt()
-        #    pygame.draw.circle(screen, RED, pos, 5)
             
