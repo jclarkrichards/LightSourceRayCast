@@ -12,13 +12,13 @@ class LightSource(object):
         self.position = (10, 10)
         self.positionVec = Vector2(0, 0)
         self.rays = []
-        self.createRays()
-        #self.createTestRays()
+        #self.createRays()
+        self.createTestRays()
         print("Number of rays: " + str(len(self.rays)))
         self.endpoints = []
 
     def createTestRays(self):
-        self.rays.append(Ray(self.positionVec, self.segments[8].start))
+        self.rays.append(Ray(self.positionVec, self.segments[4].start))
         #self.rays.append(Ray(self.positionVec, self.segments[1].start))
         
     def createRays(self):

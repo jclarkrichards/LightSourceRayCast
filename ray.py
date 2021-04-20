@@ -89,7 +89,7 @@ class Ray(object):
                                 Svalues_new.pop(index)
                                 Tvalues_new.pop(index)
                                 segments_new.pop(index)
-                                self.allpoints.append(segment.start + segment.vec * T)
+                                self.addEndPoint(segment.start + segment.vec * T)
                             else:
                                 endpointFound = True
                     else:
@@ -106,7 +106,7 @@ class Ray(object):
                 #self.intersectors.append(segment.start + segment.vec * T)
                 #self.intersectorTest = segment.start + segment.vec * T
                 self.end = segment.start + segment.vec * T
-                self.allpoints.append(self.end)
+                self.addEndPoint(self.end)
                 #    pass
             else:
                 #print("Hitting an end point")
@@ -114,8 +114,10 @@ class Ray(object):
                 #self.allpoints.append(self.end)
                 self.intersectorTest = None
                 
-            
-        
+    def addEndPoint(self, point):
+        if point not in self.allpoints:
+            self.allpoints.append(point)
+                
             
     def render(self, screen):
         pygame.draw.line(screen, YELLOW, self.start.asTuple(), self.end.asTuple(), 1)
