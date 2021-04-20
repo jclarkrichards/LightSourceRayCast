@@ -34,3 +34,10 @@ class Vertex(object):
 				self.vectors.append(vec.normalize())		
 		else:
 			print("Too many segments, only 2 are allowed!")
+
+	def dividingRay(self, ray):
+		val1 = ray.norm.cross(self.vectors[0])
+		val2 = ray.norm.cross(self.vectors[1])
+		if val1 < 0 and val2 < 0 or val1 > 0 and val2 > 0:
+			return False
+		return True

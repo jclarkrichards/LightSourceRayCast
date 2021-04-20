@@ -46,8 +46,11 @@ class Ray(object):
         self.end = self.start + self.norm * best_s
         self.addEndPoint(self.end)
 
-        if t == 0 or t == 1:
-            print("Can the ray proceed?");
+        if best_t == 0 or best_t == 1:          
+            #print("Can the ray proceed?");
+            vertex = best_segment.getVertex(best_t)
+            #print(vertex)
+            print(vertex.dividingRay(self))
                
 
             

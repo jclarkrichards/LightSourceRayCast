@@ -35,8 +35,8 @@ class GameController(object):
     def createPlayer(self):
         self.player = LightSource()
         self.player.setVisibleShapes(self.shapes)
-        #self.player.createTestRays()
-        self.player.createRays()
+        self.player.createTestRays()
+        #self.player.createRays()
 
     def addShapeToWorld(self, vertices, color=(255,255,255), width=0):
         for vertex in vertices:

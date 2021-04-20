@@ -52,6 +52,11 @@ class Segment(object):
         if abs(value) < self.thresh:
             return 0
         return value
+
+    def getVertex(self, value):
+        if value == 0: return self.tail
+        return self.head
+
     """
     #def addNeighbor(self, segment):
     #    self.neighbors.append(segment)
