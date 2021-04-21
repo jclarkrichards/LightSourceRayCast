@@ -22,11 +22,56 @@ class Ray(object):
         Also create 2 probes that point to the left and right of the anchor'''
         s = self.anchor - self.start
         self.norm = s.normalize()
-        #self.probe1 = Vector2(self.norm.y, -self.norm.x)*20# * 0.00001
-        #self.probe2 = Vector2(-self.norm.y, self.norm.x)*20# * 0.00001
-        #print(self.rayprobe1)
         
-    def intersect(self, segments):
+    def intersect(self, allsegments):
+        '''Given a list of segments, determine which segments we are intersecting with and where
+        The closest segment is the one we are interested in.'''
+        svalues = []
+        tvalues = []
+        segments = []
+        self.allpoints = []
+        if self.norm.magnitudeSquared() != 0:
+            for i, segment in enumerate(allsegments):
+                t, s = segment.intersect(self)     
+                if s != -1:
+                    svalues.append(s)
+                    tvalues.append(t)
+                    segments.append(segment)
+
+            #print("Only " + str(len(segments)) + " segments to test")
+            #print(svalues)
+            #print(tvalues)
+            #print("")
+            
+            finished = False
+            while not finished:
+                if len(svalues) > 0:
+                    i = svalues.index(min(svalues))
+                    best_s = svalues[i]
+                    best_t = tvalues[i]
+                    best_segment = segments[i]
+                    if best_t == 0 or best_t == 1:
+                        vertex = best_segment.getVertex(best_t)
+                        if vertex.dividingRay(self):
+                            finished = True
+                        else:
+                            self.addEndPoint(vertex.position)
+                            svalues.remove(best_s)
+                            tvalues.remove(best_t)
+                            segments.remove(best_segment)
+                    else:
+                        finished = True
+                    
+                else:
+                    finished = True
+            
+
+            self.end = self.start + self.norm * best_s
+            self.addEndPoint(self.end)
+
+                
+               
+    def intersect_second_attempt(self, segments):
         '''Given a list of segments, determine which segments we are intersecting with and where
         The closest segment is the one we are interested in.'''
         best_segment = segments[0]
@@ -34,7 +79,7 @@ class Ray(object):
         best_t = 0
         self.allpoints = []
         if self.norm.magnitudeSquared() != 0:
-            for segment in segments:
+            for i, segment in enumerate(segments):
                 t, s = segment.intersect(self)     
                 if s != -1:
                     if s < best_s:
@@ -50,7 +95,8 @@ class Ray(object):
             #print("Can the ray proceed?");
             vertex = best_segment.getVertex(best_t)
             #print(vertex)
-            print(vertex.dividingRay(self))
+            if not vertex.dividingRay(self):
+                pass
                
 
             
@@ -142,8 +188,9 @@ class Ray(object):
                 self.intersectorTest = None
                 
     def addEndPoint(self, point):
-        if point not in self.allpoints:
-            self.allpoints.append(point)
+        pointInt = point.asInt()
+        if pointInt not in self.allpoints:
+            self.allpoints.append(pointInt)
                 
             
     def render(self, screen):

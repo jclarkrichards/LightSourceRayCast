@@ -46,6 +46,7 @@ class LightSource(object):
             ray.update(self.position)
             ray.intersect(self.segments)
             self.endpoints += ray.allpoints
+        self.endpoints = list(set(self.endpoints))
         #print("")
             
     def render(self, screen):
@@ -53,7 +54,10 @@ class LightSource(object):
         for ray in self.rays:
             ray.render(screen)
 
-        #print("There are " + str(len(self.endpoints)) + " end points")
+        print("There are " + str(len(self.endpoints)) + " end points")
         for endpoint in self.endpoints:
-            pos = endpoint.asInt()
-            pygame.draw.circle(screen, RED, pos, 5)
+            print(endpoint)
+            #pos = endpoint.asInt()
+            #print(pos)
+            pygame.draw.circle(screen, RED, endpoint, 5)
+        print("")
