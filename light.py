@@ -61,3 +61,5 @@ class LightSource(object):
             #print(pos)
             pygame.draw.circle(screen, RED, endpoint, 5)
         print("")
+        #self.endpoints.sort()
+        #pygame.draw.polygon(screen, YELLOW, self.endpoints, 0)
