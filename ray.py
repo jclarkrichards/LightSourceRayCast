@@ -11,7 +11,8 @@ class Ray(object):
         self.setNormVec()
         self.intersectorTest = None #just for testing to show where ray is intersecting
         self.allpoints = []
-        
+        self.reachable = False
+
     def update(self, start):
         '''Update the origin of each ray as the light source moves around'''
         self.start = start
@@ -51,10 +52,12 @@ class Ray(object):
                     best_t = tvalues[i]
                     best_segment = segments[i]
                     if best_t == 0 or best_t == 1:
+                        self.reachable = True
                         vertex = best_segment.getVertex(best_t)
                         if vertex.dividingRay(self):
                             finished = True
                         else:
+                            
                             self.addEndPoint(vertex.position)
                             svalues.remove(best_s)
                             tvalues.remove(best_t)

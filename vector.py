@@ -64,3 +64,18 @@ class Vector2(object):
 
     def cross(self, other):
         return self.x*other.y - self.y*other.x
+
+    def angle(self, other):
+        '''Return the angle in radians that these 2 vectors make'''
+        mag = self.magnitude()
+        othermag = other.magnitude()
+        if mag != 0 and othermag != 0:
+            val = self.dot(other) / (mag * othermag)
+            val = min(val, 1)
+            val = max(val, -1)
+            A = math.acos(val)
+
+            if self.cross(other) < 0:
+                return 2*math.pi - A
+            return A
+        return 999 #what should I return by default?  This really should never happen
