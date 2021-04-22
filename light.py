@@ -12,7 +12,9 @@ class LightSource(object):
         self.position = Vector2(0, 0)
         self.rays = []
         
-        self.endpoints = []
+        #self.endpoints = []
+        self.vertex_points = []
+        self.nonvertex_points = []
         self.vertices = []
 
     def updatePosition(self, pos):
@@ -41,36 +43,29 @@ class LightSource(object):
 
     def createRay(self, vertex):
         '''Create a ray from light position to the vertex.  Return the ray if the vertex is reachable only'''
-        ray = Ray(self.position, vertex.position)
+        ray = Ray(self.position, vertex)
         ray.intersect(self.segments)
-        if ray.reachable:
+        if len(ray.vertex_point) != 0:
+            #if ray.reachable:
             return ray
         return None
 
     def update(self):
         self.updatePosition(pygame.mouse.get_pos())
         self.vertices = self.orderRays()
-        #print(str(len(self.vertices)) + " vertices")
-        #for v in self.vertices:
-        #    print(v)
-        #print("")
-        self.endpoints = []
+        #self.endpoints = []
+        self.vertex_points = []
+        self.nonvertex_points = []
         self.rays = []
         for vertex in self.vertices:
             ray = self.createRay(vertex)
-            #print(str(len(self.rays)) + " rays")
             if ray is not None:
                 self.rays.append(ray)
-                #ray.intersect(self.segments)
-                self.endpoints += ray.allpoints
-        
-        #for ray in self.rays:
-        #    ray.update(self.position)
-        #    ray.intersect(self.segments)
-        #    self.endpoints += ray.allpoints
-        self.endpoints = list(set(self.endpoints))
-        #print("")
-        
+                #self.endpoints += ray.allpoints
+                self.vertex_points += ray.vertex_point
+                self.nonvertex_points += ray.nonvertex_points
+                
+        #self.endpoints = list(set(self.endpoints))
         
     def orderRays(self):
         '''We need to order the rays in order to connect all of the endpoints'''
@@ -100,11 +95,15 @@ class LightSource(object):
             ray.render(screen)
 
         #print("There are " + str(len(self.endpoints)) + " end points")
-        for endpoint in self.endpoints:
+        for endpoint in self.vertex_points:
+            #for endpoint in self.endpoints:
             #print(endpoint)
             #pos = endpoint.asInt()
             #print(pos)
             pygame.draw.circle(screen, RED, endpoint, 5)
+
+        for endpoint in self.nonvertex_points:
+            pygame.draw.circle(screen, BLUE, endpoint, 5)
         #print("")
         #self.endpoints.sort()
         #pygame.draw.polygon(screen, YELLOW, self.endpoints, 0)
