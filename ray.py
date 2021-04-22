@@ -12,9 +12,9 @@ class Ray(object):
         #self.anchor = end #never changes.  Where the ray is always pointing towards
         self.setNormVec()
         self.intersectorTest = None #just for testing to show where ray is intersecting
-        self.vertex_point = [] #If the ray reaches the vertex then this will be non-empty
-        self.nonvertex_points = []
-        #self.reachable = False
+
+        self.vertex_point = None #If the ray reaches the vertex then this will be not be None (x,y)
+        self.end_point = None #If the end point for the ray is not its vertex, then this will not be None (x,y)
 
     def update(self, start):
         '''Update the origin of each ray as the light source moves around'''
@@ -60,7 +60,8 @@ class Ray(object):
                         #self.reachable = True
                         vertex = best_segment.getVertex(best_t)
                         if vertex == self.vertex:
-                            self.vertex_point.append(vertex.position.asInt())
+                            self.vertex_point = vertex.position.asInt()
+                            #self.vertex_point.append(vertex.position.asInt())
                         #else:
                         #    self.nonvertex_points.append(vertex.position.asInt())
                             
@@ -74,7 +75,8 @@ class Ray(object):
                     else:
                         finished = True
                         end = self.start + self.norm * best_s
-                        self.nonvertex_points.append(end.asInt())
+                        self.end_point = end.asInt()
+                        #self.nonvertex_points.append(end.asInt())
                     
                 else:
                     finished = True

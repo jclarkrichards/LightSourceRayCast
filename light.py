@@ -14,7 +14,7 @@ class LightSource(object):
         
         #self.endpoints = []
         self.vertex_points = []
-        self.nonvertex_points = []
+        self.end_points = []
         self.vertices = []
 
     def updatePosition(self, pos):
@@ -45,7 +45,7 @@ class LightSource(object):
         '''Create a ray from light position to the vertex.  Return the ray if the vertex is reachable only'''
         ray = Ray(self.position, vertex)
         ray.intersect(self.segments)
-        if len(ray.vertex_point) != 0:
+        if ray.vertex_point is not None:
             #if ray.reachable:
             return ray
         return None
@@ -55,15 +55,17 @@ class LightSource(object):
         self.vertices = self.orderRays()
         #self.endpoints = []
         self.vertex_points = []
-        self.nonvertex_points = []
+        self.end_points = []
         self.rays = []
         for vertex in self.vertices:
             ray = self.createRay(vertex)
             if ray is not None:
                 self.rays.append(ray)
                 #self.endpoints += ray.allpoints
-                self.vertex_points += ray.vertex_point
-                self.nonvertex_points += ray.nonvertex_points
+                if ray.vertex_point is not None:
+                    self.vertex_points.append(ray.vertex_point)
+                if ray.end_point is not None:
+                    self.end_points.append(ray.end_point)
                 
         #self.endpoints = list(set(self.endpoints))
         
@@ -102,7 +104,7 @@ class LightSource(object):
             #print(pos)
             pygame.draw.circle(screen, RED, endpoint, 5)
 
-        for endpoint in self.nonvertex_points:
+        for endpoint in self.end_points:
             pygame.draw.circle(screen, BLUE, endpoint, 5)
         #print("")
         #self.endpoints.sort()
