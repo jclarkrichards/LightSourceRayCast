@@ -2,6 +2,7 @@ import pygame
 from constants import *
 from vector import Vector2
 
+
 class Ray(object):
     def __init__(self, start, vertex):
         #print("Create ray")
@@ -13,8 +14,8 @@ class Ray(object):
         self.setNormVec()
         self.intersectorTest = None #just for testing to show where ray is intersecting
 
-        self.vertex_point = None #If the ray reaches the vertex then this will be not be None (x,y)
-        self.end_point = None #If the end point for the ray is not its vertex, then this will not be None (x,y)
+        self.vertex_point = None #If the ray reaches the vertex then this will be not be None (Vertex)
+        self.end_point = None #If the end point for the ray is not its vertex, then this will not be None (x, y)
 
     def update(self, start):
         '''Update the origin of each ray as the light source moves around'''
@@ -60,7 +61,7 @@ class Ray(object):
                         #self.reachable = True
                         vertex = best_segment.getVertex(best_t)
                         if vertex == self.vertex:
-                            self.vertex_point = vertex.position.asInt()
+                            self.vertex_point = vertex #.position.asInt()
                             #self.vertex_point.append(vertex.position.asInt())
                         #else:
                         #    self.nonvertex_points.append(vertex.position.asInt())

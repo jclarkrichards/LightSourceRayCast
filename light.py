@@ -2,6 +2,7 @@ import pygame
 from constants import *
 from vector import Vector2
 from ray import Ray
+from stack import Stack
 
 """Just follows the mouse around the screen and sends out light rays.
 For testing this can be defined as the player."""
@@ -10,12 +11,16 @@ class LightSource(object):
         '''Gets a list of all of the segments'''
         self.segments = []
         self.position = Vector2(0, 0)
-        self.rays = []
+        self.rays = Stack()
+        self.polygonPoints = Stack() #Points that make up the visibility polygon.  Each point is a tuple (x, y)
         
         #self.endpoints = []
         self.vertex_points = []
         self.end_points = []
         self.vertices = []
+
+        self.counter = 0
+        self.timer = 0
 
     def updatePosition(self, pos):
         self.position.x = pos[0]
@@ -34,12 +39,12 @@ class LightSource(object):
 
     def createTestRays(self):
         '''Create a ray that points from this light source to a defined vertex'''
-        self.rays.append(Ray(self.position, self.segments[4].tail.position))
+        self.rays.push(Ray(self.position, self.segments[4].tail.position))
         
     def createRays(self):
         '''Create a ray that points from origin to each vertex of each shape'''
         for segment in self.segments:
-            self.rays.append(Ray(self.position, segment.tail.position))
+            self.rays.push(Ray(self.position, segment.tail.position))
 
     def createRay(self, vertex):
         '''Create a ray from light position to the vertex.  Return the ray if the vertex is reachable only'''
@@ -56,19 +61,20 @@ class LightSource(object):
         #self.endpoints = []
         self.vertex_points = []
         self.end_points = []
-        self.rays = []
+        self.rays.clear()
         for vertex in self.vertices:
             ray = self.createRay(vertex)
             if ray is not None:
-                self.rays.append(ray)
+                self.rays.push(ray)
                 #self.endpoints += ray.allpoints
                 if ray.vertex_point is not None:
-                    self.vertex_points.append(ray.vertex_point)
+                    self.vertex_points.append(ray.vertex_point.position.asInt())
                 if ray.end_point is not None:
                     self.end_points.append(ray.end_point)
                 
         #self.endpoints = list(set(self.endpoints))
-        
+        self.createVisibilityPolygon()
+
     def orderRays(self):
         '''We need to order the rays in order to connect all of the endpoints'''
         probe = self.vertices[0]
@@ -88,24 +94,54 @@ class LightSource(object):
 
         return tempVertices
 
-    
+
+    def createVisibilityPolygon(self):
+        '''We create the polygon by connecting all of the points in the ray list'''
+        self.polygonPoints.clear()
+
+        #while len(self.rays) > 0:
             
-    def render(self, screen):
+
+
+        #for ray in self.rays:
+        #    self.polygonPoints.append(ray.vertex_point.position.asInt())
+        #    if ray.end_point is not None:
+        #        self.polygonPoints.append(ray.end_point)
+            
+
+
+    def render(self, screen, dt):
         pygame.draw.circle(screen, WHITE, self.position.asTuple(), 8)
+        if not self.polygonPoints.isEmpty():
+            pygame.draw.polygon(screen, YELLOW, self.polygonPoints, 0)
+
+
         #print(str(len(self.rays)) + " rays to draw")
-        for ray in self.rays:
+        for ray in self.rays.items:
             ray.render(screen)
 
+        #self.timer += dt
+        #if self.timer >= 0.5:
+        #    self.counter += 1
+        #    self.timer = 0
+        #    if self.counter == len(self.vertex_points):
+        #        self.counter = 0
+
         #print("There are " + str(len(self.endpoints)) + " end points")
-        for endpoint in self.vertex_points:
+        #for i, endpoint in enumerate(self.vertex_points):
             #for endpoint in self.endpoints:
             #print(endpoint)
             #pos = endpoint.asInt()
             #print(pos)
-            pygame.draw.circle(screen, RED, endpoint, 5)
+        #    if i == self.counter:
+        #        pygame.draw.circle(screen, WHITE, endpoint, 8)
+        #    else:
+        #        pygame.draw.circle(screen, RED, endpoint, 5)
 
         for endpoint in self.end_points:
             pygame.draw.circle(screen, BLUE, endpoint, 5)
         #print("")
         #self.endpoints.sort()
         #pygame.draw.polygon(screen, YELLOW, self.endpoints, 0)
+
+        

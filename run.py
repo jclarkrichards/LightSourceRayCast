@@ -19,6 +19,7 @@ class GameController(object):
         self.segments = []
         self.vertices = []
         self.player = None
+        self.clock = pygame.time.Clock()
         
     def setBackground(self):
         self.background = pygame.surface.Surface(SCREENSIZE).convert()
@@ -45,6 +46,7 @@ class GameController(object):
         self.shapes.append(Shape(vertices, width, color))
     
     def update(self):
+        self.dt = self.clock.tick(30) / 1000.0
         if self.player is not None:
             self.player.update()
         self.checkEvents()
@@ -60,7 +62,7 @@ class GameController(object):
         for shape in self.shapes:
             shape.render(self.screen)
         if self.player is not None:
-            self.player.render(self.screen)
+            self.player.render(self.screen, self.dt)
         pygame.display.update()
 
 

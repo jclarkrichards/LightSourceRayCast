@@ -15,6 +15,7 @@ class Segment(object):
         #self.norm = self.vec.normalize()
         self.thresh = 0.000000001
         #self.neighbors = [] #Other segments that are connected to this segment
+ 
 
     def __str__(self):
         return "Segment: " + str(self.tail) + " ===> " + str(self.head)
@@ -56,6 +57,22 @@ class Segment(object):
     def getVertex(self, value):
         if value == 0: return self.tail
         return self.head
+
+    def containsPoint(self, point):
+        '''Given some point in Vector2 form, determine if the point lines on this segment'''
+        test1 = point - self.head.position
+        test2 = point - self.tail.position
+        cvalue = test1.cross(test2)
+        if abs(cvalue) <= self.thresh:
+            dvalue = test1.dot(test2)
+            if dvalue <= 0:
+                return True
+        return False
+
+
+                
+
+    
 
     """
     #def addNeighbor(self, segment):
