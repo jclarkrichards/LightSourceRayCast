@@ -13,7 +13,8 @@ class LightSource(object):
         self.position = Vector2(0, 0)
         self.rays = Stack()
         self.polygonPoints = Stack() #Points that make up the visibility polygon.  Each point is a tuple (x, y)
-        
+        self.segmentTest = Stack()
+
         #self.endpoints = []
         self.vertex_points = []
         self.end_points = []
@@ -95,10 +96,25 @@ class LightSource(object):
         return tempVertices
 
 
+    def getSegmentsFromPoint(self, point):
+        '''Get the segments that this point lies on'''
+        self.segmentTest.clear()
+        for segment in self.segments:
+            if segment.containsPoint(point):
+                self.segmentTest.push(segment)
+
+
     def createVisibilityPolygon(self):
         '''We create the polygon by connecting all of the points in the ray list'''
         self.polygonPoints.clear()
-        
+
+
+        testn = 0
+        for ray in self.rays.items:
+            if ray.vertex_point is not None and ray.end_point is None:
+                testn += 1
+        if testn == 0:
+            print("No rays with only 1 point found!!!!!!!!!!!!!")
         
         #print(str(len(self.vertices)) + " >= " + str(len(self.vertex_points)))
         

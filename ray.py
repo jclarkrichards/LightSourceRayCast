@@ -6,9 +6,9 @@ from vector import Vector2
 class Ray(object):
     def __init__(self, start, vertex):
         #print("Create ray")
-        self.start = start  #follows the light source
+        self.start = start  #follows the light source.  Is a Vector2
         #self.end = end  #End end of this ray will change as the light source moves around
-        self.vertex = vertex
+        self.vertex = vertex #Vertex this ray is always pointing towards
         self.end = vertex.position
         #self.anchor = end #never changes.  Where the ray is always pointing towards
         self.setNormVec()
@@ -32,10 +32,11 @@ class Ray(object):
         '''This is just a quick test to see if this ray intersects with any segment.  Return True if so'''
         for segment in allsegments:
             t, s = segment.intersect(self)
-            if s != -1:
-                if 0 < t < 1:
-                    return True
-        return False
+            print(segment)
+            print(t, s)
+            
+   
+        
         
     def intersect(self, allsegments):
         '''Given a list of segments, determine which segments we are intersecting with and where

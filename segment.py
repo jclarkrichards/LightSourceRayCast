@@ -26,6 +26,7 @@ class Segment(object):
             return True
         return False
 
+
     def intersect(self, ray):
         '''Return the T value where the ray intersects the segment'''
         denom = self.vec.cross(ray.norm)
