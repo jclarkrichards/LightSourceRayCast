@@ -98,7 +98,10 @@ class LightSource(object):
     def createVisibilityPolygon(self):
         '''We create the polygon by connecting all of the points in the ray list'''
         self.polygonPoints.clear()
-
+        
+        
+        #print(str(len(self.vertices)) + " >= " + str(len(self.vertex_points)))
+        
         #while len(self.rays) > 0:
             
 

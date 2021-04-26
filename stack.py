@@ -31,3 +31,5 @@ class Stack(object):
             item1 = self.pop()
             self.push(item0)
             self.push(item1)
+
+    

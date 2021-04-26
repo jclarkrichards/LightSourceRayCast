@@ -25,7 +25,7 @@ class Segment(object):
         if self.tail == other.tail and self.head == other.head:
             return True
         return False
-    
+
     def intersect(self, ray):
         '''Return the T value where the ray intersects the segment'''
         denom = self.vec.cross(ray.norm)
@@ -37,9 +37,6 @@ class Segment(object):
             s = num2 / denom
             t = self.compareSmallValues(t)            
 
-            #if t <= self.thresh: t = 0
-            #if abs(t-1) <= self.thresh: t = 1
-            
             if s > 0 and 0 <= t <= 1:
                 return t, s
             else:

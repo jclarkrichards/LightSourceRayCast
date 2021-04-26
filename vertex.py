@@ -9,6 +9,7 @@ from vector import Vector2
 class Vertex(object):
     def __init__(self, x, y):
         self.position = Vector2(x, y)
+        self.segments = [] #should always have only 2 segments
         self.vectors = []
 
     def __str__(self):
@@ -32,6 +33,7 @@ class Vertex(object):
             elif segment.head == self:
                 vec = segment.tail.position - segment.head.position
                 self.vectors.append(vec.normalize())
+            self.segments.append(segment)
         else:
             print("Too many segments, only 2 are allowed!")
 

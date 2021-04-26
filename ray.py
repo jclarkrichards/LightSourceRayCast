@@ -27,6 +27,15 @@ class Ray(object):
         Also create 2 probes that point to the left and right of the anchor'''
         s = self.vertex.position - self.start
         self.norm = s.normalize()
+
+    def intersectQuick(self, allsegments):
+        '''This is just a quick test to see if this ray intersects with any segment.  Return True if so'''
+        for segment in allsegments:
+            t, s = segment.intersect(self)
+            if s != -1:
+                if 0 < t < 1:
+                    return True
+        return False
         
     def intersect(self, allsegments):
         '''Given a list of segments, determine which segments we are intersecting with and where
@@ -86,6 +95,8 @@ class Ray(object):
             self.end = self.start + self.norm * best_s
             #self.addEndPoint(self.end)
 
+
+            
             
     #def addEndPoint(self, point):
     #    pointInt = point.asInt()
