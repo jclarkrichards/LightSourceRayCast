@@ -13,7 +13,7 @@ class LightSource(object):
         self.position = Vector2(0, 0)
         self.rays = Stack()
         self.polygonPoints = Stack() #Points that make up the visibility polygon.  Each point is a tuple (x, y)
-        self.segmentTest = Stack()
+        self.segmentTest = []
 
         #self.endpoints = []
         self.vertex_points = []
@@ -68,10 +68,10 @@ class LightSource(object):
             if ray is not None:
                 self.rays.push(ray)
                 #self.endpoints += ray.allpoints
-                if ray.vertex_point is not None:
-                    self.vertex_points.append(ray.vertex_point.position.asInt())
-                if ray.end_point is not None:
-                    self.end_points.append(ray.end_point)
+                #if ray.vertex_point is not None:
+                #    self.vertex_points.append(ray.vertex_point.position.asInt())
+                #if ray.end_point is not None:
+                #    self.end_points.append(ray.end_point)
                 
         #self.endpoints = list(set(self.endpoints))
         self.createVisibilityPolygon()
@@ -98,23 +98,63 @@ class LightSource(object):
 
     def getSegmentsFromPoint(self, point):
         '''Get the segments that this point lies on'''
-        self.segmentTest.clear()
+        self.segmentTest = []
         for segment in self.segments:
-            if segment.containsPoint(point):
-                self.segmentTest.push(segment)
+            if segment.containsPoint(Vector2(*point)):
+                self.segmentTest.append(segment)
+
+    def pointInSegments(self, point):
+        '''Check if the point is in on of the segments Tests'''
+        for segment in self.segmentTest:
+            if segment.containsPoint(Vector2(*point)):
+                return True
+        return False
 
 
     def createVisibilityPolygon(self):
         '''We create the polygon by connecting all of the points in the ray list'''
         self.polygonPoints.clear()
+        if not self.rays.isEmpty():
+            ray = self.rays.pop()
+            if ray.end_point is not None:
+                self.polygonPoints.push(ray.end_point)
+            self.polygonPoints.push(ray.vertex_point)
+            self.getSegmentsFromPoint(self.polygonPoints.peek())
 
+            while not self.rays.isEmpty():
+                ray = self.rays.pop()
 
-        testn = 0
-        for ray in self.rays.items:
-            if ray.vertex_point is not None and ray.end_point is None:
-                testn += 1
-        if testn == 0:
-            print("No rays with only 1 point found!!!!!!!!!!!!!")
+                if self.pointInSegments(ray.vertex_point):
+                    self.polygonPoints.push(ray.vertex_point)
+                    if ray.end_point is not None:
+                        self.polygonPoints.push(ray.end_point)
+          
+                else:
+                    if ray.end_point is not None:
+                        if self.pointInSegments(ray.end_point):
+                            self.polygonPoints.push(ray.end_point)
+                            self.polygonPoints.push(ray.vertex_point)
+                        else:
+                            self.polygonPoints.swap()
+                            self.getSegmentsFromPoint(self.polygonPoints.peek())
+
+                            if self.pointInSegments(ray.vertex_point):
+                                self.polygonPoints.push(ray.vertex_point)
+                                if ray.end_point is not None:
+                                    self.polygonPoints.push(ray.end_point)
+                            else:
+                                if self.pointInSegments(ray.end_point):
+                                    self.polygonPoints.push(ray.end_point)
+                                    self.polygonPoints.push(ray.vertex_point)
+                                else:
+                                    pass
+
+                    else:
+                        pass
+                        #self.polygonPoints.swap()
+                self.getSegmentsFromPoint(self.polygonPoints.peek())
+                        
+        
         
         #print(str(len(self.vertices)) + " >= " + str(len(self.vertex_points)))
         
@@ -130,14 +170,15 @@ class LightSource(object):
 
 
     def render(self, screen, dt):
-        pygame.draw.circle(screen, WHITE, self.position.asTuple(), 8)
+        
+        #print(self.polygonPoints)
         if not self.polygonPoints.isEmpty():
-            pygame.draw.polygon(screen, YELLOW, self.polygonPoints, 0)
+            pygame.draw.polygon(screen, YELLOW, self.polygonPoints.items, 0)
 
-
+        pygame.draw.circle(screen, WHITE, self.position.asTuple(), 8)
         #print(str(len(self.rays)) + " rays to draw")
-        for ray in self.rays.items:
-            ray.render(screen)
+        #for ray in self.rays.items:
+        #    ray.render(screen)
 
         #self.timer += dt
         #if self.timer >= 0.5:
@@ -157,8 +198,8 @@ class LightSource(object):
         #    else:
         #        pygame.draw.circle(screen, RED, endpoint, 5)
 
-        for endpoint in self.end_points:
-            pygame.draw.circle(screen, BLUE, endpoint, 5)
+        #for endpoint in self.end_points:
+        #    pygame.draw.circle(screen, BLUE, endpoint, 5)
         #print("")
         #self.endpoints.sort()
         #pygame.draw.polygon(screen, YELLOW, self.endpoints, 0)

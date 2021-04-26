@@ -71,7 +71,7 @@ class Ray(object):
                         #self.reachable = True
                         vertex = best_segment.getVertex(best_t)
                         if vertex == self.vertex:
-                            self.vertex_point = vertex #.position.asInt()
+                            self.vertex_point = vertex.position.asInt()
                             #self.vertex_point.append(vertex.position.asInt())
                         #else:
                         #    self.nonvertex_points.append(vertex.position.asInt())
