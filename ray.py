@@ -14,14 +14,14 @@ class Ray(object):
         self.setNormVec()
         self.intersectorTest = None #just for testing to show where ray is intersecting
 
-        self.vertex_point = None #If the ray reaches the vertex then this will be not be None (Vertex)
+        self.vertex_point = None #If the ray reaches the vertex then this will be not be None (x, y)
         self.end_point = None #If the end point for the ray is not its vertex, then this will not be None (x, y)
 
         #These 2 offsets are used for checking segment crossings by offsetting this ray to the left and right a bit
         #These are Vector2s that we can use to slightly adjust the position of this ray when needed
         #They are always perpendicular to this ray
-        self.left = Vector2()  #(y, -x)
-        self.right = Vector2() #(-y, x)
+        #self.left = Vector2()  #(y, -x)
+        #self.right = Vector2() #(-y, x)
         
     def update(self, start):
         '''Update the origin of each ray as the light source moves around'''
@@ -33,6 +33,8 @@ class Ray(object):
         Also create 2 probes that point to the left and right of the anchor'''
         s = self.vertex.position - self.start
         self.norm = s.normalize()
+        #self.left = Vector2(self.norm.y, -self.norm.x)
+        #self.right = Vector2(-self.norm.y, self.norm.x)
 
     def intersectQuick(self, allsegments):
         '''This is just a quick test to see if this ray intersects with any segment.  Return True if so'''
@@ -43,6 +45,17 @@ class Ray(object):
             
    
         
+    def checkVertexSegmentSide(self):  #Return 0 for left side and 1 for right side
+        '''Determine if the segments attached to vertex ray points to is on the left or right side of ray'''
+        val0 = self.norm.cross(self.vertex.vectors[0])
+        val1 = self.norm.cross(self.vertex.vectors[1])
+        if val0 > 0 or val1 > 0: return 1
+        return 0
+
+       
+        
+
+
         
     def intersect(self, allsegments):
         '''Given a list of segments, determine which segments we are intersecting with and where

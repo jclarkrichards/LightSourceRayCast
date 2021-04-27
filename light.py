@@ -11,8 +11,8 @@ class LightSource(object):
         '''Gets a list of all of the segments'''
         self.segments = []
         self.position = Vector2(0, 0)
-        self.rays = Stack()
-        self.polygonPoints = Stack() #Points that make up the visibility polygon.  Each point is a tuple (x, y)
+        self.rays = []
+        self.polygonPoints = [] #Points that make up the visibility polygon.  Each point is a tuple (x, y)
         self.segmentTest = []
 
         #self.endpoints = []
@@ -40,12 +40,12 @@ class LightSource(object):
 
     def createTestRays(self):
         '''Create a ray that points from this light source to a defined vertex'''
-        self.rays.push(Ray(self.position, self.segments[4].tail.position))
+        self.rays.append(Ray(self.position, self.segments[4].tail.position))
         
     def createRays(self):
         '''Create a ray that points from origin to each vertex of each shape'''
         for segment in self.segments:
-            self.rays.push(Ray(self.position, segment.tail.position))
+            self.rays.append(Ray(self.position, segment.tail.position))
 
     def createRay(self, vertex):
         '''Create a ray from light position to the vertex.  Return the ray if the vertex is reachable only'''
@@ -62,11 +62,11 @@ class LightSource(object):
         #self.endpoints = []
         self.vertex_points = []
         self.end_points = []
-        self.rays.clear()
+        self.rays = []
         for vertex in self.vertices:
             ray = self.createRay(vertex)
             if ray is not None:
-                self.rays.push(ray)
+                self.rays.append(ray)
                 #self.endpoints += ray.allpoints
                 #if ray.vertex_point is not None:
                 #    self.vertex_points.append(ray.vertex_point.position.asInt())
@@ -74,7 +74,7 @@ class LightSource(object):
                 #    self.end_points.append(ray.end_point)
                 
         #self.endpoints = list(set(self.endpoints))
-        self.createVisibilityPolygonTest()
+        self.createVisibilityPolygon()
 
     def orderRays(self):
         '''We need to order the rays in order to connect all of the endpoints'''
@@ -111,16 +111,28 @@ class LightSource(object):
         return False
 
 
-    def createVisibilityPolygonTest(self):
-        self.polygonPoints.clear()
-        if not self.rays.isEmpty():
-            ray = self.rays.pop()
-            print(ray)
-            print(str(ray.vertex_point) + " :: " + str(ray.end_point))
-            print("")
-        else:
-            print("EMPTY????????")
+    def createVisibilityPolygon(self):
+        self.polygonPoints = []
+        if len(self.rays) > 0:
+        #if not self.rays.isEmpty():
+            for ray in self.rays:   
+                #ray = self.rays.pop()
+
+                if ray.end_point is not None:
+                    test = ray.checkVertexSegmentSide()
+                    if test == 1: #Right side [end_point, vertex_point]
+                        self.polygonPoints.append(ray.end_point)
+                        self.polygonPoints.append(ray.vertex_point)
+                        #print("Right side")
+                    else: #Left side [vertex_point, end_point]
+                        #print("Left side")
+                        self.polygonPoints.append(ray.vertex_point)
+                        self.polygonPoints.append(ray.end_point)
+                        
+                else:
+                    self.polygonPoints.append(ray.vertex_point)
             
+    """    
     def createVisibilityPolygon(self):
         '''We create the polygon by connecting all of the points in the ray list'''
         self.polygonPoints.clear()
@@ -178,17 +190,17 @@ class LightSource(object):
         #        self.polygonPoints.append(ray.end_point)
             
 
-
+    """
     def render(self, screen, dt):
         
         #print(self.polygonPoints)
-        if not self.polygonPoints.isEmpty():
-            pygame.draw.polygon(screen, YELLOW, self.polygonPoints.items, 0)
+        if len(self.polygonPoints) > 0:
+            pygame.draw.polygon(screen, DARKYELLOW, self.polygonPoints, 0)
 
-        pygame.draw.circle(screen, WHITE, self.position.asTuple(), 8)
+        #pygame.draw.circle(screen, WHITE, self.position.asTuple(), 8)
         #print(str(len(self.rays)) + " rays to draw")
-        for ray in self.rays.items:
-            ray.render(screen)
+        #for ray in self.rays:
+        #    ray.render(screen)
 
         #self.timer += dt
         #if self.timer >= 0.5:

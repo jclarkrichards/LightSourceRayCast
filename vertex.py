@@ -10,7 +10,7 @@ class Vertex(object):
     def __init__(self, x, y):
         self.position = Vector2(x, y)
         self.segments = [] #should always have only 2 segments
-        self.vectors = []
+        self.vectors = []  #Unit Vector2 representation of segments 
 
     def __str__(self):
         return "Vertex: " + str(self.position)
