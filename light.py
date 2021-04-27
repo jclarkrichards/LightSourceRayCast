@@ -74,7 +74,7 @@ class LightSource(object):
                 #    self.end_points.append(ray.end_point)
                 
         #self.endpoints = list(set(self.endpoints))
-        self.createVisibilityPolygon()
+        self.createVisibilityPolygonTest()
 
     def orderRays(self):
         '''We need to order the rays in order to connect all of the endpoints'''
@@ -111,6 +111,16 @@ class LightSource(object):
         return False
 
 
+    def createVisibilityPolygonTest(self):
+        self.polygonPoints.clear()
+        if not self.rays.isEmpty():
+            ray = self.rays.pop()
+            print(ray)
+            print(str(ray.vertex_point) + " :: " + str(ray.end_point))
+            print("")
+        else:
+            print("EMPTY????????")
+            
     def createVisibilityPolygon(self):
         '''We create the polygon by connecting all of the points in the ray list'''
         self.polygonPoints.clear()
@@ -177,8 +187,8 @@ class LightSource(object):
 
         pygame.draw.circle(screen, WHITE, self.position.asTuple(), 8)
         #print(str(len(self.rays)) + " rays to draw")
-        #for ray in self.rays.items:
-        #    ray.render(screen)
+        for ray in self.rays.items:
+            ray.render(screen)
 
         #self.timer += dt
         #if self.timer >= 0.5:

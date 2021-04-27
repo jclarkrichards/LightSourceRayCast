@@ -17,6 +17,12 @@ class Ray(object):
         self.vertex_point = None #If the ray reaches the vertex then this will be not be None (Vertex)
         self.end_point = None #If the end point for the ray is not its vertex, then this will not be None (x, y)
 
+        #These 2 offsets are used for checking segment crossings by offsetting this ray to the left and right a bit
+        #These are Vector2s that we can use to slightly adjust the position of this ray when needed
+        #They are always perpendicular to this ray
+        self.left = Vector2()  #(y, -x)
+        self.right = Vector2() #(-y, x)
+        
     def update(self, start):
         '''Update the origin of each ray as the light source moves around'''
         self.start = start
