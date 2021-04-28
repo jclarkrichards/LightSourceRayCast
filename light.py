@@ -193,14 +193,14 @@ class LightSource(object):
     """
     def render(self, screen, dt):
         
-        #print(self.polygonPoints)
+        print(self.polygonPoints)
         if len(self.polygonPoints) > 0:
             pygame.draw.polygon(screen, DARKYELLOW, self.polygonPoints, 0)
 
         #pygame.draw.circle(screen, WHITE, self.position.asTuple(), 8)
         #print(str(len(self.rays)) + " rays to draw")
-        #for ray in self.rays:
-        #    ray.render(screen)
+        for ray in self.rays:
+            ray.render(screen)
 
         #self.timer += dt
         #if self.timer >= 0.5:
