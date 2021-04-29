@@ -3,6 +3,7 @@ from constants import *
 from vector import Vector2
 from ray import Ray
 from stack import Stack
+from copy import deepcopy
 
 """Just follows the mouse around the screen and sends out light rays.
 For testing this can be defined as the player."""
@@ -58,12 +59,12 @@ class LightSource(object):
 
     def update(self):
         self.updatePosition(pygame.mouse.get_pos())
-        self.vertices = self.orderRays()
+        orderedVertices = self.orderVertices()
         #self.endpoints = []
         self.vertex_points = []
         self.end_points = []
         self.rays = []
-        for vertex in self.vertices:
+        for vertex in orderedVertices:
             ray = self.createRay(vertex)
             if ray is not None:
                 self.rays.append(ray)
@@ -76,20 +77,37 @@ class LightSource(object):
         #self.endpoints = list(set(self.endpoints))
         self.createVisibilityPolygon()
 
-    def orderRays(self):
-        '''We need to order the rays in order to connect all of the endpoints'''
-        probe = self.vertices[0]
-        v = probe.position - self.position
+    def orderVertices(self):
+        '''We need to order the vertices in order to connect all of the endpoints'''
+        vertices = deepcopy(self.vertices)
+        probe = vertices[0] #Make this the starting point, just as good as any
+        v = probe.position - self.position #just a vector pointing towards the probe vertex
         tempVertices = []
-        tempVertices.append(probe)
-        self.vertices.remove(probe)
+        #tempVertices.append(probe)
+        #vertices.remove(probe)
         angles = []
-        for vertex in self.vertices:
-            angles.append(v.angle(vertex.position - self.position))
-
+        #Find all the angles of other vertices relative to this vertex
+        for vertex in vertices:
+            angle = v.angle(vertex.position - self.position)
+            if angle in self.angles:
+                index = angles.index(angle)
+                prev_vertex = vertices[index]
+                v_old = prev_vertex.position - self.position
+                v_new = vertex.position - self.position
+                if v_new.magnitudeSquared() < v_old.magnitudeSquared():
+                    tempVertices.remove(prev_vertex)
+                    tempVertices.append(vertex)
+                    angles.remove(angle)
+                    angles.append(angle)
+            else:
+                angles.append(angle)
+                tempVertices.append(vertex)
+        #Find any duplicate angles or angles with a 0 value.  For duplicates only keep the closest vertex
+        
+        
         while len(angles) > 0:
             index = angles.index(min(angles))
-            tempVertices.append(self.vertices[index])
+            tempVertices.append(vertices[index])
             self.vertices.pop(index)
             angles.pop(index)
 
