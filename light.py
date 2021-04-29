@@ -59,7 +59,12 @@ class LightSource(object):
 
     def update(self):
         self.updatePosition(pygame.mouse.get_pos())
+        print("==============================")
         orderedVertices = self.orderVertices()
+        print("==============================")
+        #print(str(len(orderedVertices)) + " out of " + str(len(self.vertices)) + " vertices used")
+        print("")
+        
         #self.endpoints = []
         self.vertex_points = []
         self.end_points = []
@@ -79,22 +84,26 @@ class LightSource(object):
 
     def orderVertices(self):
         '''We need to order the vertices in order to connect all of the endpoints'''
-        vertices = deepcopy(self.vertices)
+        vertices = deepcopy(self.vertices) #do not modify the original list of vertices
         probe = vertices[0] #Make this the starting point, just as good as any
         v = probe.position - self.position #just a vector pointing towards the probe vertex
         tempVertices = []
+        finalVertices = []
         #tempVertices.append(probe)
         #vertices.remove(probe)
         angles = []
         #Find all the angles of other vertices relative to this vertex
         for vertex in vertices:
             angle = v.angle(vertex.position - self.position)
-            if angle in self.angles:
+            print(str(vertex) + " :: Angle = " + str(angle))
+            
+            if angle in angles:
                 index = angles.index(angle)
-                prev_vertex = vertices[index]
+                prev_vertex = tempVertices[index]
                 v_old = prev_vertex.position - self.position
                 v_new = vertex.position - self.position
                 if v_new.magnitudeSquared() < v_old.magnitudeSquared():
+                    print("new vertex is closer, so get rid of old one")
                     tempVertices.remove(prev_vertex)
                     tempVertices.append(vertex)
                     angles.remove(angle)
@@ -102,16 +111,16 @@ class LightSource(object):
             else:
                 angles.append(angle)
                 tempVertices.append(vertex)
-        #Find any duplicate angles or angles with a 0 value.  For duplicates only keep the closest vertex
-        
-        
+                   
+        print("Final angles: " + str(angles))
         while len(angles) > 0:
             index = angles.index(min(angles))
-            tempVertices.append(vertices[index])
-            self.vertices.pop(index)
+            finalVertices.append(tempVertices.pop(index))
+            #tempVertices.pop(index)
             angles.pop(index)
-
-        return tempVertices
+        
+        #return vertices
+        return finalVertices
 
 
     def getSegmentsFromPoint(self, point):
@@ -211,7 +220,7 @@ class LightSource(object):
     """
     def render(self, screen, dt):
         
-        print(self.polygonPoints)
+        #print(self.polygonPoints)
         if len(self.polygonPoints) > 0:
             pygame.draw.polygon(screen, DARKYELLOW, self.polygonPoints, 0)
 

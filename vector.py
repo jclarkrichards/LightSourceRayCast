@@ -76,6 +76,10 @@ class Vector2(object):
             A = math.acos(val)
 
             if self.cross(other) < 0:
-                return 2*math.pi - A
-            return A
+                A = 2*math.pi - A
+                #return 2*math.pi - A
+
+            if (A - int(A)) <= self.thresh:
+                return int(A)
+            return round(A, 4)
         return 999 #what should I return by default?  This really should never happen
