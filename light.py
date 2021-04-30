@@ -59,11 +59,11 @@ class LightSource(object):
 
     def update(self):
         self.updatePosition(pygame.mouse.get_pos())
-        print("==============================")
+        #print("==============================")
         orderedVertices = self.orderVertices()
-        print("==============================")
+        #print("==============================")
         #print(str(len(orderedVertices)) + " out of " + str(len(self.vertices)) + " vertices used")
-        print("")
+        #print("")
         
         #self.endpoints = []
         self.vertex_points = []
@@ -74,10 +74,10 @@ class LightSource(object):
             if ray is not None:
                 self.rays.append(ray)
                 #self.endpoints += ray.allpoints
-                #if ray.vertex_point is not None:
-                #    self.vertex_points.append(ray.vertex_point.position.asInt())
-                #if ray.end_point is not None:
-                #    self.end_points.append(ray.end_point)
+                if ray.vertex_point is not None:
+                    self.vertex_points.append(ray.vertex_point)
+                if ray.end_point is not None:
+                    self.end_points.append(ray.end_point)
                 
         #self.endpoints = list(set(self.endpoints))
         self.createVisibilityPolygon()
@@ -95,7 +95,7 @@ class LightSource(object):
         #Find all the angles of other vertices relative to this vertex
         for vertex in vertices:
             angle = v.angle(vertex.position - self.position)
-            print(str(vertex) + " :: Angle = " + str(angle))
+            #print(str(vertex) + " :: Angle = " + str(angle))
             
             if angle in angles:
                 index = angles.index(angle)
@@ -103,7 +103,7 @@ class LightSource(object):
                 v_old = prev_vertex.position - self.position
                 v_new = vertex.position - self.position
                 if v_new.magnitudeSquared() < v_old.magnitudeSquared():
-                    print("new vertex is closer, so get rid of old one")
+                    #print("new vertex is closer, so get rid of old one")
                     tempVertices.remove(prev_vertex)
                     tempVertices.append(vertex)
                     angles.remove(angle)
@@ -112,7 +112,7 @@ class LightSource(object):
                 angles.append(angle)
                 tempVertices.append(vertex)
                    
-        print("Final angles: " + str(angles))
+        #print("Final angles: " + str(angles))
         while len(angles) > 0:
             index = angles.index(min(angles))
             finalVertices.append(tempVertices.pop(index))
@@ -226,8 +226,8 @@ class LightSource(object):
 
         #pygame.draw.circle(screen, WHITE, self.position.asTuple(), 8)
         #print(str(len(self.rays)) + " rays to draw")
-        for ray in self.rays:
-            ray.render(screen)
+        #for ray in self.rays:
+        #    ray.render(screen)
 
         #self.timer += dt
         #if self.timer >= 0.5:
@@ -247,6 +247,9 @@ class LightSource(object):
         #    else:
         #        pygame.draw.circle(screen, RED, endpoint, 5)
 
+        for p in self.vertex_points:
+            pygame.draw.circle(screen, RED, p, 5)
+            
         #for endpoint in self.end_points:
         #    pygame.draw.circle(screen, BLUE, endpoint, 5)
         #print("")

@@ -14,14 +14,9 @@ class Ray(object):
         self.setNormVec()
         self.intersectorTest = None #just for testing to show where ray is intersecting
 
-        self.vertex_point = None #If the ray reaches the vertex then this will be not be None (x, y)
+        self.vertex_point = None #If the ray reaches the vertex then this will not be None (x, y)
         self.end_point = None #If the end point for the ray is not its vertex, then this will not be None (x, y)
-
-        #These 2 offsets are used for checking segment crossings by offsetting this ray to the left and right a bit
-        #These are Vector2s that we can use to slightly adjust the position of this ray when needed
-        #They are always perpendicular to this ray
-        #self.left = Vector2()  #(y, -x)
-        #self.right = Vector2() #(-y, x)
+        self.no_end_point_test = False
         
     def update(self, start):
         '''Update the origin of each ray as the light source moves around'''
@@ -33,8 +28,6 @@ class Ray(object):
         Also create 2 probes that point to the left and right of the anchor'''
         s = self.vertex.position - self.start
         self.norm = s.normalize()
-        #self.left = Vector2(self.norm.y, -self.norm.x)
-        #self.right = Vector2(-self.norm.y, self.norm.x)
 
     def intersectQuick(self, allsegments):
         '''This is just a quick test to see if this ray intersects with any segment.  Return True if so'''
@@ -53,9 +46,6 @@ class Ray(object):
         return 0
 
        
-        
-
-
         
     def intersect(self, allsegments):
         '''Given a list of segments, determine which segments we are intersecting with and where
@@ -78,10 +68,9 @@ class Ray(object):
             #print("")
             
             finished = False
-            #while len(svalues) > 0:
             while not finished:
                 if len(svalues) > 0:
-                    i = svalues.index(min(svalues))
+                    i = svalues.index(min(svalues)) #lowest svalue is closest intersection
                     best_s = svalues[i]
                     best_t = tvalues[i]
                     best_segment = segments[i]
@@ -91,29 +80,39 @@ class Ray(object):
                         vertex = best_segment.getVertex(best_t)
                         if vertex == self.vertex:
                             self.vertex_point = vertex.position.asInt()
-                            #self.vertex_point.append(vertex.position.asInt())
-                        #else:
-                        #    self.nonvertex_points.append(vertex.position.asInt())
                             
                         if vertex.dividingRay(self):
                             finished = True
+                            self.no_end_point_test = True
+                            
                         else:                            
-                            #self.addEndPoint(vertex.position)
                             svalues.remove(best_s)
                             tvalues.remove(best_t)
                             segments.remove(best_segment)
+
+                            #if len(svalues) == 0 and self.end_point is None:
+                            #    end = self.start + self.norm * best_s
+                            #    self.end_point = end.asInt()
+                            #    finished = True
                     else:
                         finished = True
                         end = self.start + self.norm * best_s
                         self.end_point = end.asInt()
-                        #self.nonvertex_points.append(end.asInt())
                     
                 else:
                     finished = True
             
 
             self.end = self.start + self.norm * best_s
-            #self.addEndPoint(self.end)
+            if self.end_point is None:
+                #print(str(self.vertex) + " :: best_t = " + str(best_t))
+                if best_t == 0 or best_t == 1:
+                    #end = self.start + self.norm * best_s
+                    self.end_point = self.end.asInt()
+
+                else:
+                    if not self.no_end_point_test:
+                        self.end_point = self.end.asInt()
 
 
             
