@@ -32,12 +32,16 @@ class GameController(object):
         #self.addShapeToWorld(((SCREENWIDTH-50, SCREENHEIGHT-50),  (SCREENWIDTH-100, SCREENHEIGHT-50), (SCREENWIDTH-50, SCREENHEIGHT-100)), color=(200, 200, 200))
         #self.addShapeToWorld(((50, SCREENHEIGHT-50),  (100, SCREENHEIGHT-50), (50, SCREENHEIGHT-100)), color=(200, 200, 200))
 
-        #self.addShapeToWorld(((500,50),  (520, 150), (450, 120)), color=(200, 200, 200))
-        #self.addShapeToWorld(((200,100), (300, 220), (180, 350), (100, 300)), color=(0, 100, 180))
-        #self.addShapeToWorld(((300,400), (250, 500), (210, 410)), color=(200, 0, 0))
+        self.addShapeToWorld(((500,50),  (520, 150), (450, 120)), color=(200, 200, 200))
+        self.addShapeToWorld(((200,100), (300, 220), (180, 350), (100, 300)), color=(0, 100, 180))
+        self.addShapeToWorld(((300,400), (250, 500), (210, 410)), color=(200, 0, 0))
         self.addShapeToWorld(((550, 400), (550, 500), (450, 500), (450, 400)), color=(30,100,90))
+
         #self.addShapeToWorld(((600,150), (700, 160), (720, 400), (580, 280)), color=(70, 200, 100))
         self.addShapeToWorld(((320, 400), (350, 220), (280, 310)), color=(30,100,90))
+
+        self.addShapeToWorld(((600,150), (700, 160), (720, 400), (580, 280)), color=(70, 200, 100))
+
 
     def createPlayer(self):
         self.player = LightSource()
