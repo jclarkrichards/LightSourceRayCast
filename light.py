@@ -74,10 +74,10 @@ class LightSource(object):
             if ray is not None:
                 self.rays.append(ray)
                 #self.endpoints += ray.allpoints
-                #if ray.vertex_point is not None:
-                #    self.vertex_points.append(ray.vertex_point.position.asInt())
-                #if ray.end_point is not None:
-                #    self.end_points.append(ray.end_point)
+                if ray.vertex_point is not None:
+                    self.vertex_points.append(ray.vertex_point)
+                if ray.end_point is not None:
+                    self.end_points.append(ray.end_point)
                 
         #self.endpoints = list(set(self.endpoints))
         self.createVisibilityPolygon()
@@ -138,6 +138,8 @@ class LightSource(object):
         return False
 
 
+
+
     def createVisibilityPolygon(self):
         self.polygonPoints = []
         if len(self.rays) > 0:
@@ -159,65 +161,7 @@ class LightSource(object):
                 else:
                     self.polygonPoints.append(ray.vertex_point)
             
-    """    
-    def createVisibilityPolygon(self):
-        '''We create the polygon by connecting all of the points in the ray list'''
-        self.polygonPoints.clear()
-        if not self.rays.isEmpty():
-            ray = self.rays.pop()
-            if ray.end_point is not None:
-                self.polygonPoints.push(ray.end_point)
-            self.polygonPoints.push(ray.vertex_point)
-            self.getSegmentsFromPoint(self.polygonPoints.peek())
-
-            while not self.rays.isEmpty():
-                ray = self.rays.pop()
-
-                if self.pointInSegments(ray.vertex_point):
-                    self.polygonPoints.push(ray.vertex_point)
-                    if ray.end_point is not None:
-                        self.polygonPoints.push(ray.end_point)
-          
-                else:
-                    if ray.end_point is not None:
-                        if self.pointInSegments(ray.end_point):
-                            self.polygonPoints.push(ray.end_point)
-                            self.polygonPoints.push(ray.vertex_point)
-                        else:
-                            self.polygonPoints.swap()
-                            self.getSegmentsFromPoint(self.polygonPoints.peek())
-
-                            if self.pointInSegments(ray.vertex_point):
-                                self.polygonPoints.push(ray.vertex_point)
-                                if ray.end_point is not None:
-                                    self.polygonPoints.push(ray.end_point)
-                            else:
-                                if self.pointInSegments(ray.end_point):
-                                    self.polygonPoints.push(ray.end_point)
-                                    self.polygonPoints.push(ray.vertex_point)
-                                else:
-                                    pass
-
-                    else:
-                        pass
-                        #self.polygonPoints.swap()
-                self.getSegmentsFromPoint(self.polygonPoints.peek())
-                        
-        
-        
-        #print(str(len(self.vertices)) + " >= " + str(len(self.vertex_points)))
-        
-        #while len(self.rays) > 0:
-            
-
-
-        #for ray in self.rays:
-        #    self.polygonPoints.append(ray.vertex_point.position.asInt())
-        #    if ray.end_point is not None:
-        #        self.polygonPoints.append(ray.end_point)
-            
-
-    """
+    
     def render(self, screen, dt):
         
         #print(self.polygonPoints)
@@ -247,8 +191,12 @@ class LightSource(object):
         #    else:
         #        pygame.draw.circle(screen, RED, endpoint, 5)
 
-        #for endpoint in self.end_points:
-        #    pygame.draw.circle(screen, BLUE, endpoint, 5)
+        print("There are " + str(len(self.vertex_points)) + " vertex points")
+        for p in self.vertex_points:
+            pygame.draw.circle(screen, RED, p, 5)
+
+        for endpoint in self.end_points:
+            pygame.draw.circle(screen, BLUE, endpoint, 5)
         #print("")
         #self.endpoints.sort()
         #pygame.draw.polygon(screen, YELLOW, self.endpoints, 0)
