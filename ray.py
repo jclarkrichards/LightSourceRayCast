@@ -14,10 +14,16 @@ class Ray(object):
         self.setNormVec()
         self.intersectorTest = None #just for testing to show where ray is intersecting
 
-        self.vertex_point = None #If the ray reaches the vertex then this will not be None (x, y)
-        self.end_point = None #If the end point for the ray is not its vertex, then this will not be None (x, y)
-        self.no_end_point_test = False
+        #self.vertex_point = None #If the ray reaches the vertex then this will not be None (x, y)
+        #self.end_point = None #If the end point for the ray is not its vertex, then this will not be None (x, y)
+        #self.no_end_point_test = False
+        self.points = [] #meant to replace vertex_point and end_point
+        self.segments = []
+        self.vertex_reached = False
         
+    def __str__(self):
+        return "Ray: P = " + str(self.start) + " Dir = " + str(self.norm)
+
     def update(self, start):
         '''Update the origin of each ray as the light source moves around'''
         self.start = start
@@ -45,8 +51,62 @@ class Ray(object):
         if val0 > 0 or val1 > 0: return 1
         return 0
 
-       
-        
+    def intersect(self, allsegments):
+        '''Given a list of segments, determine which segments we are intersecting with and where
+        The closest segment is the one we are interested in.'''
+        svalues = []
+        tvalues = []
+        segments = []
+        self.allpoints = []
+        if self.norm.magnitudeSquared() != 0:
+            for i, segment in enumerate(allsegments):
+                t, s = segment.intersect(self)     
+                if s != -1:
+                    svalues.append(s)
+                    tvalues.append(t)
+                    segments.append(segment)
+           
+
+
+            finished = False
+            while not finished:
+                if len(svalues) > 0:
+                    i = svalues.index(min(svalues)) #lowest svalue is closest intersection
+                    best_s = svalues[i]
+                    best_t = tvalues[i]
+                    best_segment = segments[i]
+                    if best_t == 0 or best_t == 1:  #intersection a Vertex                     
+                        vertex = best_segment.getVertex(best_t)
+                        self.addPoint(vertex)
+                        #self.points.append(vertex.position.asInt())
+                        #self.segments.append(vertex.segments)
+                        if vertex == self.vertex:
+                            self.vertex_reached = True                     
+                        
+                        if vertex.dividingRay(self):
+                            finished = True                                                               
+                        else:                            
+                            svalues.remove(best_s)
+                            tvalues.remove(best_t)
+                            segments.remove(best_segment)
+
+                    else: #intersection not a vertex
+                        #print("Does this ever happen?")
+                        finished = True
+                        end = self.start + self.norm * best_s
+                        #self.addPoint(end.asInt())
+                        self.points.append(end.asInt())
+                        self.segments.append([best_segment])
+                        
+                        
+                    
+                else:
+                    finished = True
+            
+            self.end = self.start + self.norm * best_s
+            
+
+    """  
     def intersect(self, allsegments):
         '''Given a list of segments, determine which segments we are intersecting with and where
         The closest segment is the one we are interested in.'''
@@ -80,7 +140,7 @@ class Ray(object):
                         vertex = best_segment.getVertex(best_t)
                         if vertex == self.vertex:
                             self.vertex_point = vertex.position.asInt()
-                            
+                            self.points.append(vertex.position.asInt())
                         if vertex.dividingRay(self):
                             finished = True
                             self.no_end_point_test = True
@@ -90,14 +150,11 @@ class Ray(object):
                             tvalues.remove(best_t)
                             segments.remove(best_segment)
 
-                            #if len(svalues) == 0 and self.end_point is None:
-                            #    end = self.start + self.norm * best_s
-                            #    self.end_point = end.asInt()
-                            #    finished = True
                     else:
                         finished = True
                         end = self.start + self.norm * best_s
                         self.end_point = end.asInt()
+                        self.points.append(end.asInt())
                     
                 else:
                     finished = True
@@ -109,18 +166,21 @@ class Ray(object):
                 if best_t == 0 or best_t == 1:
                     #end = self.start + self.norm * best_s
                     self.end_point = self.end.asInt()
-
+                    self.points.append(self.end.asInt())
                 else:
                     if not self.no_end_point_test:
                         self.end_point = self.end.asInt()
-
+                        self.points.append(self.end.asInt())
 
             
-            
-    #def addEndPoint(self, point):
-    #    pointInt = point.asInt()
-    #    if pointInt not in self.allpoints:
-    #        self.allpoints.append(pointInt)
+    """  
+    
+    def addPoint(self, vertex):
+        if vertex.position.asInt() not in self.points:
+            self.points.append(vertex.position.asInt())
+            self.segments.append(vertex.segments)
+
+       
                 
             
     def render(self, screen):

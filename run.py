@@ -37,7 +37,7 @@ class GameController(object):
         self.addShapeToWorld(((300,400), (250, 500), (210, 410)), color=(200, 0, 0))
         self.addShapeToWorld(((550, 400), (550, 500), (450, 500), (450, 400)), color=(30,100,90))
 
-        #self.addShapeToWorld(((600,150), (700, 160), (720, 400), (580, 280)), color=(70, 200, 100))
+        self.addShapeToWorld(((600,150), (700, 160), (720, 400), (580, 280)), color=(70, 200, 100))
         self.addShapeToWorld(((320, 400), (350, 220), (280, 310)), color=(30,100,90))
 
         self.addShapeToWorld(((600,150), (700, 160), (720, 400), (580, 280)), color=(70, 200, 100))
@@ -70,11 +70,13 @@ class GameController(object):
     def render(self):
         self.screen.blit(self.background, (0, 0))
 
-        if self.player is not None:
-            self.player.render(self.screen, self.dt)
+        
 
         for shape in self.shapes:
             shape.render(self.screen)
+
+        if self.player is not None:
+            self.player.render(self.screen, self.dt)
         
         pygame.display.update()
 

@@ -23,6 +23,7 @@ class LightSource(object):
 
         self.counter = 0
         self.timer = 0
+        self.triangles = []
 
     def updatePosition(self, pos):
         self.position.x = pos[0]
@@ -52,7 +53,8 @@ class LightSource(object):
         '''Create a ray from light position to the vertex.  Return the ray if the vertex is reachable only'''
         ray = Ray(self.position, vertex)
         ray.intersect(self.segments)
-        if ray.vertex_point is not None:
+        if ray.vertex_reached:
+        #if ray.vertex_point is not None:
             #if ray.reachable:
             return ray
         return None
@@ -74,13 +76,14 @@ class LightSource(object):
             if ray is not None:
                 self.rays.append(ray)
                 #self.endpoints += ray.allpoints
-                if ray.vertex_point is not None:
-                    self.vertex_points.append(ray.vertex_point)
-                if ray.end_point is not None:
-                    self.end_points.append(ray.end_point)
+                #if ray.vertex_point is not None:
+                #    self.vertex_points.append(ray.vertex_point)
+                #if ray.end_point is not None:
+                #    self.end_points.append(ray.end_point)
                 
         #self.endpoints = list(set(self.endpoints))
-        self.createVisibilityPolygon()
+        self.createVisibilityTriangles()
+        #self.createVisibilityPolygon()
 
     def orderVertices(self):
         '''We need to order the vertices in order to connect all of the endpoints'''
@@ -122,13 +125,27 @@ class LightSource(object):
         #return vertices
         return finalVertices
 
-
     def getSegmentsFromPoint(self, point):
-        '''Get the segments that this point lies on'''
-        self.segmentTest = []
+        '''Given a point, return a list of segments that contains this point'''
+        result = []
         for segment in self.segments:
             if segment.containsPoint(Vector2(*point)):
-                self.segmentTest.append(segment)
+                result.append(segment)
+        return result
+
+    def checkSegmentInBoth(self, segmentList1, segmentList2):
+        '''Given two lists of segments, check to see if there is a segment in both'''
+        for segment in segmentList1:
+            if segment in segmentList2:
+                return True
+        return False
+
+    #def getSegmentsFromPoint(self, point):
+    #    '''Get the segments that this point lies on'''
+    #    self.segmentTest = []
+    #    for segment in self.segments:
+    #        if segment.containsPoint(Vector2(*point)):
+    #            self.segmentTest.append(segment)
 
     def pointInSegments(self, point):
         '''Check if the point is in on of the segments Tests'''
@@ -137,8 +154,33 @@ class LightSource(object):
                 return True
         return False
 
+    
+    def createVisibilityTriangles(self):
+        '''Going to create the area of visibility using triangles'''
+        self.triangles = []
+        for i in range(len(self.rays)):
+            found = False
+            r0 = self.rays[i]
+            if (i+1) == len(self.rays):
+                r1 = self.rays[0]
+            else:
+                r1 = self.rays[i+1]
 
 
+            for i, r0p in enumerate(r0.points):
+                for j, r1p in enumerate(r1.points):
+                    #seglist0 = self.getSegmentsFromPoint(r0p)
+                    #seglist1 = self.getSegmentsFromPoint(r1p)
+                    seglist0 = r0.segments[i]
+                    seglist1 = r1.segments[j]
+                    if self.checkSegmentInBoth(seglist0, seglist1):
+                        self.triangles.append((self.position.asInt(), r0p, r1p))
+                        found = True
+                        break
+                if found:
+                    break
+            
+          
 
     def createVisibilityPolygon(self):
         self.polygonPoints = []
@@ -165,13 +207,20 @@ class LightSource(object):
     def render(self, screen, dt):
         
         #print(self.polygonPoints)
-        if len(self.polygonPoints) > 0:
-            pygame.draw.polygon(screen, DARKYELLOW, self.polygonPoints, 0)
+        #if len(self.polygonPoints) > 0:
+        #    pygame.draw.polygon(screen, DARKYELLOW, self.polygonPoints, 0)
 
         #pygame.draw.circle(screen, WHITE, self.position.asTuple(), 8)
         #print(str(len(self.rays)) + " rays to draw")
-        #for ray in self.rays:
-        #    ray.render(screen)
+        
+
+        #print(str(len(self.triangles)) + " triangles")
+        #print(str(len(self.triangles)) + " triangles")
+        for triangle in self.triangles:
+            pygame.draw.polygon(screen, DARKYELLOW, triangle, 0)
+
+        for ray in self.rays:
+            ray.render(screen)
 
         #self.timer += dt
         #if self.timer >= 0.5:
@@ -192,12 +241,30 @@ class LightSource(object):
         #        pygame.draw.circle(screen, RED, endpoint, 5)
 
 
-        print("There are " + str(len(self.vertex_points)) + " vertex points")
-        for p in self.vertex_points:
-            pygame.draw.circle(screen, RED, p, 5)
+        #print("There are " + str(len(self.vertex_points)) + " vertex points")
+        #for p in self.vertex_points:
+        #    pygame.draw.circle(screen, RED, p, 5)
 
-        for endpoint in self.end_points:
-            pygame.draw.circle(screen, BLUE, endpoint, 5)
+        #for endpoint in self.end_points:
+        #    pygame.draw.circle(screen, BLUE, endpoint, 5)
+        #print(str(len(self.rays)) + " rays")
+       
+        for ray in self.rays:
+            #print("Ray has " + str(len(ray.points)) + " points")
+            #print("Ray has " + str(len(ray.segments)) + " segments")
+            #for i in range(len(ray.points)):
+                #pygame.draw.circle(screen, BLUE, ray.points[i], 5)
+                #print(str(i) + " ..... " + str(ray.points[i]))
+                #print(ray.segments[i])
+                #for s in ray.segments[i]:
+                #    print(s)
+                
+            #print(ray.points)
+            #print(ray.segments)
+            #print("---------------------------------------------------------------")
+            #print(str(ray) + " has " + str(len(ray.points)) + " points and " + str(len(ray.segments)) + " segments")
+            for p in ray.points:
+                pygame.draw.circle(screen, BLUE, p, 5)
 
         #print("")
         #self.endpoints.sort()
